@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Replace excel with libreoffice
+#
+
+set -eu -o pipefail
+
+libreoffice --calc $@
+

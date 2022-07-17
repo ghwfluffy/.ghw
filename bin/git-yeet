@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Alias git rm to git yeet
+#
+
+set -eu -o pipefail
+
+git rm ${@}
+

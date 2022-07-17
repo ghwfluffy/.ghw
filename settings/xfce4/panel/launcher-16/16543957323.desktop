@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Exec=google-chrome --new-window
+Icon=google-chrome
+StartupNotify=false
+Terminal=false
+Type=Application
+Categories=Utility;X-XFCE;
+Name=Google Chrome
+Comment=Google Chrome
+Keywords=program;applications;bookmarks;
+X-XFCE-Source=file:///usr/share/applications/xfce4-appfinder.desktop
+Path=/tmp

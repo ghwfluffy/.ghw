@@ -1,0 +1,117 @@
+" Don't do that weird thing where it skips to the matching bracer
+set noshowmatch
+" Search case insensitive unless a capital letter is used
+set ignorecase
+set smartcase
+" Incremental search
+set incsearch
+" Highlight found search items
+set hlsearch
+" Wrap lines at the end of the screen
+set wrap
+" Set tabs to count as 4 spaces
+set tabstop=4
+" Insert spaces instead of tabs when tab is pressed
+set expandtab
+" Number of spaces to use during an autoindent or cindent
+set shiftwidth=4
+" Don't automatically add c-style indents
+set nocindent
+" Turn off autoindent (different from cindent)
+set noautoindent
+" Spell off by default
+set nospell
+" All folds are open
+set nofoldenable
+" Fold on indents
+set fdm=indent
+" Show INSERT/REPLACE/etc
+set showmode
+
+" Brainrot files use 2 space tabs
+autocmd BufRead *.vue,*.js,*.css set tabstop=2
+autocmd BufRead *.vue,*.js,*.css set shiftwidth=2
+
+" ctags
+set tags=.ctags,../.ctags,../../.ctags,../../../.ctags,../../../../.ctags,../../../../../.ctags,../../../../../../.ctags,/usr/include/.ctags,/usr/include/openssl/.ctags
+
+" C-Tags
+map <F1> :tprev<CR>
+map <F2> :tnext<CR>
+
+" Folding
+map <F3> zc
+map <F4> zo
+map <F5> zR
+
+" Toggle numbered Lines
+nnoremap <F8> :set nonumber!<CR>
+
+" Make highlighted lines appear in yellow
+hi YellowLine cterm=NONE ctermfg=black ctermbg=yellow
+" Make highlighted lines appear in green
+hi GreenLine cterm=NONE ctermfg=black ctermbg=green
+" Make highlighted lines appear in green
+hi BlueLine cterm=NONE ctermfg=white ctermbg=blue
+
+" Bind 'C' to highlight/unhighlight a line (yellow)
+nnoremap <silent> C :if exists("m" . line('.')) <Bar>
+                        \   exe "call matchdelete(m" . line('.') . ")" <Bar>
+                        \   exe "unlet m" . line('.') <Bar>
+                        \ else <Bar>
+                        \   exe "let m" . line('.') . " = matchadd('YellowLine','\\%" . line('.') . "l')" <Bar>
+                        \ endif<CR>
+
+" Bind 'D' to highlight/unhighlight a line (Green)
+nnoremap <silent> D :if exists("m" . line('.')) <Bar>
+                        \   exe "call matchdelete(m" . line('.') . ")" <Bar>
+                        \   exe "unlet m" . line('.') <Bar>
+                        \ else <Bar>
+                        \   exe "let m" . line('.') . " = matchadd('GreenLine','\\%" . line('.') . "l')" <Bar>
+                        \ endif<CR>
+
+" Bind 'X' to highlight/unhighlight a line (Blue)
+nnoremap <silent> X :if exists("m" . line('.')) <Bar>
+                        \   exe "call matchdelete(m" . line('.') . ")" <Bar>
+                        \   exe "unlet m" . line('.') <Bar>
+                        \ else <Bar>
+                        \   exe "let m" . line('.') . " = matchadd('BlueLine','\\%" . line('.') . "l')" <Bar>
+                        \ endif<CR>
+" Make 'o' work like 'i' - Common typo of mine, pisses me off
+map o i
+
+" OpenSSL asn1parse trim -dump output
+nnoremap <silent> R :%!cut -b14-60<CR>:%s/ //g<CR>:%s/\n//g<CR>:%s/-//g<CR>
+
+" Remove all duplicate newlines
+"nnoremap <silent> E :%s/\n\n/\r/g<CR>
+" Enforce specific line size
+"nnoremap <silent> E :%s/^\(.\{130\}\)/\1\r/g<CR>
+" Convert interface into override
+"nnoremap <silent> E :%s/^\(.\{130\}\)/\1\r/g<CR>
+
+" Search for space at end of line
+"nnoremap <silent> T :/\s\+$<CR>
+" Remove spaces from end of lines
+nnoremap <silent> T :%s/\s\+$//g<CR>
+
+" Replace virtuals with override
+"nnoremap <silent> Z :%s/virtual \(.*\) = 0;/\1 override;/g<CR>
+"nnoremap <silent> Z :%s/virtual \(.*\) = 0;/\1 final;/g<CR>
+
+" Green comments
+hi Comment ctermfg=2
+" Manually force green comments...
+nnoremap <silent> O :hi Comment ctermfg=2<CR>
+
+" Set system clipboard
+set clipboard=unnamed
+set viminfo='100,\"1000,:50,%,!,/100,<1000,n~/.viminfo
+
+nnoremap <silent> Y i<End>() = default;<Esc><Home>wyypvwywp<Del>i &&<Esc><Home>wyypwwiconst <Esc>ww<Del><Home>w<Up>y<Down><Enter>pwi &operator=<Esc><Home>w<Down>wi &operator=<Esc><Home>w<Up><Up><Up><Up>yy<Down><Down><Down><Down>pi~<Esc>
+
+" qml highlighting
+au BufNewFile,BufRead *.qml set ft=qml
+" swift highlighting
+au BufNewFile,BufRead *.swift set ft=java
+

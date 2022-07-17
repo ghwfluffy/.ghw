@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+echo "Setting keyboard repeat speed (200ms delay, 40/s)"
+xset r rate 200 40
+

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# Assumes starcraft is first installed game
+GAMEID=1
+
+env LUTRIS_SKIP_INIT=1 lutris lutris:rungameid/${GAMEID}
+

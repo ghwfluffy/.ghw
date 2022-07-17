@@ -1,0 +1,3 @@
+[submodule "contrib/oid"]
+	path = contrib/oid
+	url = https://github.com/m9aertner/oidConverter.git

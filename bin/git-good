@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# git good
+#
+
+set -eu -o pipefail
+
+echo "No you."
+

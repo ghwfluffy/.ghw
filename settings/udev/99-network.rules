@@ -1,0 +1,4 @@
+# Rename enp5s0 to eth0
+SUBSYSTEM=="net", ACTION=="add", SYSFS{address}=="50:eb:f6:7e:3e:7d", RUN+="/usr/local/bin/ghw-udev/99-rename-network.sh %k eth0"
+# Disable wifi
+SUBSYSTEM=="net", ACTION=="add", SYSFS{address}=="f4:46:37:a3:34:f0", RUN+="/usr/local/bin/ghw-udev/99-disable-network.sh %k"

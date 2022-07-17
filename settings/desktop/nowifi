@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+sudo modprobe -b -r iwlwifi -f || true
+

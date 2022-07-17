@@ -1,0 +1,25 @@
+*.swp
+outfile.tmp
+bashrc/00-default
+
+# Apps
+src/hex/bin2hex
+src/hex/hex2bin
+bin/bin2hex
+bin/hex2bin
+src/base64/base64enc
+src/base64/base64dec
+bin/base64enc
+bin/base64dec
+src/terminal-saver/terminal-saver
+bin/terminal-saver
+src/usbreset/usbreset
+bin/usbreset
+src/prettySQL/prettySQL
+bin/prettySQL
+
+# 3rd party apps
+bin/oid
+
+# Count
+.count

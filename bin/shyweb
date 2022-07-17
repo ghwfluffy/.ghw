@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+BROWSER="google-chrome"
+if [ $# -ge 1 ]; then
+    BROWSER="${1}"
+fi
+
+if ! which ${BROWSER}; then
+    echo "${BROWSER} not installed." 1>&2
+    exit 1
+fi
+
+sudo echo "Initializing sudo" &> /dev/null
+set -x
+
+sudo ifconfig tun0 down || true
+sudo surfshark-vpn down || true
+echo '1' | sudo surfshark-vpn attack
+
+sudo tee /etc/resolv.conf << EOF
+nameserver 162.252.172.57
+nameserver 149.154.159.92
+EOF
+
+${BROWSER} --new-window --incognito &
+
+set +x
+sleep 1
+clear
+echo "Connection Anonymized"
+

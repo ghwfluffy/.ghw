@@ -1,0 +1,7 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+EXEDIR="$(dirname "${0}")"
+${EXEDIR}/translate "RO" "${@}"
+
