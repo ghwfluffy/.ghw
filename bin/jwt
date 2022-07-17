@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Parse out a JSON Web Token"
+    echo "Usage: $(basename "$0") <Token>" 1>&2
+    exit 1
+fi
+
+# Get JWT (chop off any header prefix it might have)
+JWT="$(echo "${1}" | grep -o 'e.*')"
+
+# Parse out header with signature information
+HEADER="$(echo "${JWT}" | cut -d'.' -f1 | base64dec | grep -a -o '{.*}')"
+echo -n "${HEADER}" | jq .
+echo ""
+
+# Parse out payload with subject information
+PAYLOAD="$(echo "${JWT}" | cut -d'.' -f2 | base64dec | grep -a -o '{.*}')"
+echo -n "${PAYLOAD}" | jq .
+echo ""

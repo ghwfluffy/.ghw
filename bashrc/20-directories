@@ -1,0 +1,14 @@
+# To Do
+export TODO="/home/${GHWUSER}/git/todo"
+alias todo='X="$(printf %d "$(cat "${TODO}/.count")")"; let "X=X+1"; echo -n "${X}" > "${TODO}/.count"; cd "${TODO}";clear;cat "${TODO}/.TODO" | sed "s/count/${X}/g";echo "";ls;echo ""';
+
+# Speed dial
+export SPEEDIAL="/home/${GHWUSER}/git/speedial"
+alias speedial="cd ${SPEEDIAL}"
+
+# Tests
+export TESTS="/home/${GHWUSER}/git/test"
+alias tests='cd "${TESTS}"'
+
+# Fluffycoin
+export FC="/home/${GHWUSER}/git/fluffycoin"

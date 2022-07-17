@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -lt 1 ] || [ ! -f "$(which "${1}")" ]; then
+    echo "Cat an executable file from your PATH" 1>&2
+    echo "Usage: $(basename "${0}") <Executable>" 1>&2
+    exit 1
+fi
+
+cat "$(which "${1}")"

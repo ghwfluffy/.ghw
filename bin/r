@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# Cheeky program when you accidentially type r in the wrong window
+#
+
+set -eu -o pipefail
+
+echo "This is not GDB noob."

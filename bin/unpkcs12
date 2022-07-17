@@ -1,0 +1,113 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ] || [ ! -f "${1}" ]; then
+    echo "Usage: $(basename "$0") <PKCS12> [Password=safest] [dest=pki]" 1>&2
+    exit 1
+fi
+
+# Get input
+FILE="${1}"
+PW="safest"
+DEST="pki/"
+if [ $# -ge 2 ]; then
+    PW="${2}"
+fi
+
+if [ $# -ge 3 ]; then
+    DEST="${3}/"
+fi
+
+# Make output directory
+mkdir -p "${DEST}"
+
+# Export keypair
+exportRsa() {
+    openssl pkcs12 -in "${FILE}" -password "pass:${PW}" -nodes -nocerts -legacy | openssl rsa -out "${DEST}key.pem" 2> /dev/null
+}
+exportEcc() {
+    openssl pkcs12 -in "${FILE}" -password "pass:${PW}" -nodes -nocerts -legacy | openssl ec -out "${DEST}key.pem" 2> /dev/null
+}
+badKey() {
+    echo "Failed to export private key." 1>&2
+    exit 2
+}
+exportRsa || exportEcc || badKey
+
+# Export certificates
+openssl pkcs12 -in "${FILE}" -password "pass:${PW}" -nodes -nokeys -legacy | {
+    CERT=0
+    INCERT=0
+    while read line; do
+        # Which file are we handling?
+        # Assume host cert is first
+        if [ ${CERT} -eq 0 ]; then
+            FILE="${DEST}host.pem"
+        # Else next cert
+        else
+            FILE="${DEST}cert${CERT}.pem"
+        fi
+
+        # Is this the start or end of the cert
+        if [ "${line:0:5}" == "-----" ]; then
+            # Start of cert
+            if [ ${INCERT} -eq 0 ]; then
+                rm -f "${FILE}"
+                INCERT=1
+            # End of cert
+            elif [ ${INCERT} -eq 1 ]; then
+                INCERT=2
+            fi
+        fi
+
+        # Output next line from PEM
+        if [ ${INCERT} -gt 0 ]; then
+            echo "${line}" >> "${FILE}"
+        fi
+
+        # Done with cert
+        if [ ${INCERT} -eq 2 ]; then
+            INCERT=0
+            let "CERT=CERT+1" || true
+        fi
+    done
+
+    # Make combined files
+    rm -f "${DEST}Tree.pem"
+    rm -f "${DEST}FullTree.pem"
+    cat "${DEST}host.pem" > "${DEST}FullTree.pem"
+    for((i=1;i<${CERT};i++)); do
+        cat "${DEST}cert${i}.pem" >> "${DEST}Tree.pem"
+        cat "${DEST}cert${i}.pem" >> "${DEST}FullTree.pem"
+    done
+}
+
+# Output a convenient wrapper for s_client
+cat > "${DEST}client.sh" << EOF
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ \$# -lt 1 ]; then
+    echo "Usage: \$0 <Dest:Port>" 1>&2
+    exit 1
+fi
+
+# Directory with PKI
+PKI_DIR="\$(dirname "\$0")"
+if [ ! -f "\$PKI_DIR/key.pem" ]; then
+    PKI_DIR="."
+fi
+
+# Connect w/ verify
+openssl s_client -connect "\$1" -key "\$PKI_DIR/key.pem" -CAfile "\$PKI_DIR/Tree.pem" -cert "\$PKI_DIR/host.pem" -showcerts -verify 1
+EOF
+
+chmod +x "${DEST}/client.sh"
+
+# Show what got exported
+set -x
+ls --color=always "${DEST}"

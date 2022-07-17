@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+git config --global user.name "GhwFluffy"
+git config --global user.email "ghw@ghwfluffy.com"
+
+git config --global diff.tool meld
+git config --global difftool.prompt false

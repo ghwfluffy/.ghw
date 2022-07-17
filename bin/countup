@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# Start a stopwatch that prints to console
+#
+
+set -eu -o pipefail
+
+START="$((`date +%s`))"
+while true; do
+    echo -ne "$(date -u --date @$(("$(date '+%s')" - "${START}")) +%H:%M:%S)\r"
+    sleep 0.1
+done

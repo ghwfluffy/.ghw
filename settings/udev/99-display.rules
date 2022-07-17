@@ -1,0 +1,1 @@
+SUBSYSTEM=="drm",ACTION=="change",ENV{DISPLAY}=":1", ENV{XAUTHORITY}="/home/GHWUSER/.Xauthority",RUN+="/usr/local/bin/ghw-udev/99-display.sh"

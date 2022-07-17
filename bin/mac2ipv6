@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+usage() {
+    echo "Convert MAC address into IPv6" 1>&2
+    echo "Usage: $(basename "${0}") <Hardware MAC>" 1>&2
+    exit 1
+}
+
+if [ $# -lt 1 ]; then
+    usage
+    exit 1
+fi
+
+# Split MAC into components
+PARTS=($(echo "${1}" | sed 's/::/\n/g' | sed 's/:/\n/g'))
+if [ ${#PARTS[@]} -ne 6 ]; then
+    usage
+    exit 1
+fi
+
+# Flip bit 7 on the first byte
+PARTS[0]=$(printf %02x $((0x${PARTS[0]} ^ 2)))
+
+# Reformat
+echo "fe80::${PARTS[0]}${PARTS[1]}:${PARTS[2]}ff:fe${PARTS[3]}:${PARTS[4]}${PARTS[5]}"

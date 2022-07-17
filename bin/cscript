@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ] || [ ! -f "${1}" ]; then
+    echo "Run a C++ program with a shebang as if it was a script" 1>&2
+    echo "Add #!${0} to the top of a standalone C++ file and execute it." 1>&2
+    exit 1
+fi
+
+# Get input
+script="${1}"
+shift
+
+# Make temporary files
+input_tmp="$(mktemp)"
+input="$input_tmp.cpp"
+output_exe="$(mktemp)"
+
+# Cleanup on exit
+cleanup(){
+    rm -f "${input_tmp}" "${input}" "${output_exe}"
+}
+trap cleanup EXIT
+
+# Remove shebang
+head -n1 "${script}" | grep -v '^#!' > "${input}" || true
+tail -n +2 "${script}" >> "${input}"
+
+# Compile
+g++ "${input}" -o "${output_exe}"
+
+# Run
+"${output_exe}" $@

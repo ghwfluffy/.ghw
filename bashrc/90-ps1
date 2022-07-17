@@ -1,0 +1,112 @@
+# Custom shell display directory
+# This is very slow, messy, and hardcoded. Should clean it up
+function getPS1() {
+
+    # Color Defines
+    #local RED='\x1b[31m'
+    #local GREEN='\x1b[32m'
+    #local YELLOW='\x1b[33m'
+    #local BLUE='\x1b[34m'
+    #local RESET='\x1b[0m'
+
+    if [ "$1" == "--no-color" ]; then
+        local BLUE=""
+        local GREEN=""
+        local YELLOW=""
+        local RESET=""
+    else
+        local BLUE=$(tput setaf 6)
+        local GREEN=$(tput setaf 2)
+        local RESET=$(tput sgr0)
+        local YELLOW=$(tput setaf 3)
+    fi
+
+    CUR=$(pwd | sed "s/^\/home\/`whoami`/~/g")
+
+    LHS=$(echo "$CUR" | cut -d'/' -f1)
+    RHS=$(echo "$CUR" | cut -d'/' -f2-999)
+
+    PFX=""
+    while [ ${#CUR} -gt 40 ] && [ ${#PFX} -lt 20 ]
+    do
+        RHSTmp=$(echo "$RHS" | cut -d'/' -f2-999)
+        if [ "$RHSTmp" == "$RHS" ]; then break; fi
+        RHS="$RHSTmp"
+        PFX+="*"
+        #PFX+="$YELLOW*$RESET"
+        CUR="$LHS/$PFX/$RHS"
+    done
+    CUR="$(echo "$CUR" | sed "s/\*/$YELLOW*$RESET/g")"
+
+    #echo "`whoami`:$CUR$ "
+    #echo "$GREEN`whoami`$RESET:$CUR$BLUE\$$RESET "
+    #echo -e '\[\e]0;\u:'"$CUR$ "
+    echo "\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$"
+}
+
+export __CURRENT_PS2=""
+export __CURRENT_PWD=""
+function initPS2() {
+
+    local CWD="$(pwd)"
+    local CURRENT_PS2=""
+    if [ "$__CURRENT_PWD" != "$CWD" ]; then
+        export __CURRENT_PWD="$CWD"
+        # How short?
+        local MAX_LEN=30
+
+        local CUR=$(echo "$CWD" | sed "s/^\/home\/`whoami`/~/g")
+        CUR=$(echo "$CUR" | sed "s/^~\/git\/todo/[TODO]\//g")
+        CUR=$(echo "$CUR" | sed "s/\/workspace\/report/[REPORT]\//g")
+
+        local LHS=$(echo "$CUR" | cut -d'/' -f1)
+        local RHS=$(echo "$CUR" | cut -d'/' -f2-999)
+
+        local PFX=""
+        while [ ${#CUR} -gt $MAX_LEN ] && [ ${#PFX} -lt 20 ]
+        do
+            local RHSTmp=$(echo "$RHS" | cut -d'/' -f2-999)
+            if [ "$RHSTmp" == "$RHS" ]; then break; fi
+            RHS="$RHSTmp"
+            PFX+="*"
+            CUR="$LHS/$PFX/$RHS"
+        done
+
+        export __CURRENT_PS2="$CUR"
+    fi
+}
+function getPS2() {
+    initPS2
+    echo "$__CURRENT_PS2"
+}
+function getPSStars() {
+    getPS2 | \
+    grep -o '*\|\[TODO\]\|\[REPORT\]' \
+    | tr -d [:space:]
+}
+function getPSBase() {
+    getPS2 | \
+    cut -d'/' -f1 | \
+    sed 's/\[TODO\]//g' | \
+    sed 's/\[REPORT\]//g' | \
+    tr -d [:space:]
+}
+function getPSEnd() {
+    FIELD=3
+    if [ -z "$(getPSStars)" ]; then
+        FIELD=2
+    fi
+    OUT="$(getPS2 | grep -o '/.*' | cut -d'/' -f$FIELD-)"
+    if [ ! -z "$OUT" ]; then
+        echo "/$OUT" | tr -d [:space:]
+    fi
+}
+
+export PS2='ghw:$ '
+export PS1='\[\e]0;\u@\h: \w\a\]\[\033[01;32m\]\u\[\033[00m\]:\[\033[01;34m\]`getPSBase`\[\033[00m\]\[\033[01;33m\]`getPSStars`\[\033[00m\]\[\033[01;36m\]`getPSEnd`\[\033[00m\]\$ '
+
+function resetPS() {
+
+    export PS1='`getPS1 --no-color`'
+}
+ 

@@ -1,0 +1,69 @@
+# Grep
+alias sgrep='grep -RnI --exclude-dir=\.git --exclude=*_moc\.cpp --exclude=*_moc\.h --exclude=.ctags --exclude-dir=build 2> /dev/null'
+alias sigrep='grep -RnIi --exclude-dir=\.git --exclude=*_moc\.cpp --exclude=*_moc\.h --exclude=.ctags --exclude-dir=build 2> /dev/null'
+alias fgrep='cut -d":" -f1 | sort -u'
+alias hgrep='grep -RnI --include=*\.h --exclude-dir=\.git --exclude=*_moc\.h --exclude-dir=build'
+
+# Git
+alias gitfilesm="git status --porcelain --short . | grep '^M \|^A' | cut -b4-"
+alias gitbranchsort='git for-each-ref --sort=-committerdate'
+alias gbase='cd `getgitdir`'
+alias stfiles='git status . > outfile.tmp; vi outfile.tmp'
+alias stfilesm='cldiff `gitfilesm`'
+alias stadd='git add `cat outfile.tmp`'
+alias stmsg='vi commit-message.txt'
+alias stcommit='git commit -F commit-message.txt'
+
+# Fix my typos
+alias xit='exit'
+alias exot='exit'
+alias exut='exit'
+
+# Bash RC
+alias editrc='vi ~/.ghw/bashrc'
+alias reloadrc='source ~/.bashrc'
+# Vim RC
+alias editvrc='vi ~/.vimrc'
+alias editvrcc='vi ~/.vim/syntax/c.vim'
+
+# Temp files
+alias trash='vi /tmp/$$.trash'
+alias etrash='echo /tmp/$$.trash'
+alias asn1trash='cat /tmp/$$.trash | xxd -p -r | openssl asn1parse -inform DER -i -dump'
+
+# IP Tables
+alias getIPT='sudo iptables -t nat -L -n --line-numbers'
+alias clearIPT='sudo iptables -t nat -F'
+
+# PostgreSQL
+export CURQUERIES="psql rk -c 'SELECT usename, query_start, query FROM pg_stat_activity;'"
+alias dbstatus='watch -n0.5 $CURQUERIES'
+alias listdb='psql -c "SELECT datname FROM pg_database WHERE datistemplate=false"'
+
+# Hex utilities
+alias xhex2bin='xxd -r -p'
+alias xbin2hex='xxd -p | tr -d \\n'
+alias xbin2hexc='xxd -i'
+
+# Misc utilities
+#alias lock='gnome-screensaver-command --lock'
+alias lock='i3lock'
+alias xopen='xdg-open'
+alias sound='pavucontrol'
+alias cpusage='ps -eo pcpu | sort -r -k1 | { Sum=0; read line; while read line; do Sum=$(echo "$Sum + $line" | bc); done; echo $Sum; }'
+alias cputemp="sensors | grep 'CPU.*°C\|Core 0.*°C'"
+alias udevreset='sudo udevadm control --reload; sudo udevadm trigger'
+alias VALGRIND='valgrind --num-callers=50 --tool=memcheck --leak-check=full --track-origins=yes -v'
+alias ghw='X="$(cat ~/.ghw/.count)"; let "X=X+1"; echo -n "${X}" > ~/.ghw/.count; echo -e "Glory Health \\x26 Wealth [${X}]"'
+alias weather='curl wttr.in'
+alias ksnapshot=spectacle
+alias fixxfce='xfce4-panel -r'
+alias aptupdate='sudo apt-get update; sudo apt-get upgrade -y'
+
+# Fun
+alias please=sudo
+alias vengeance='kill -9'
+
+# Forward env to sudo
+alias sudo='sudo env PATH=$PATH'
+

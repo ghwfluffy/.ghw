@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Set high priority on a process ID" 1>&2
+    echo "Usage: $(basename "${0}") <Process name or PID>" 1>&2
+    exit 1
+fi
+
+function atoi() {
+    printf '%d' "$1" 2> /dev/null
+}
+
+# Did they give us an integer or a string
+PID=$(atoi "${1}" || true)
+if [ ${PID} -eq 0 ]; then
+    # Find process by matching name
+    PROCS=($(ps -e | grep "${1}" || true))
+    if [ ${#PROCS[@]} -eq 1 ]; then
+        PID="$(echo "${PROCS[0]}" | awk '{print $1}')"
+    elif [ ${#PROCS[@]} -gt 1 ]; then
+        echo "More than one process named ${1}" 1>&2
+        exit 2
+    else
+        echo "No process named ${1}" 1>&2
+        exit 3
+    fi
+fi
+
+# Get process name from PID
+PROC="$(ps -e | grep " *\<${PID}\> " | awk '{print $4}' || true)"
+if [ -z "${PROC}" ]; then
+    echo "No process with ID ${PID}" 1>&2
+    exit 4
+fi
+
+# Set high priority
+sudo renice -19 -p "${PID}"
+echo Set high priority on ${PROC} \(pid: ${PID}\)

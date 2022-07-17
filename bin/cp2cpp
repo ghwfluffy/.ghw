@@ -1,0 +1,134 @@
+#!/bin/bash
+
+usage()
+{
+    echo "Convert C++ header to C++ source template" 1>&2
+    echo "Usage: <Header>" 1>&2
+}
+
+HEADER="$1"
+if [ -z "$HEADER" ] || [ ! -f "$HEADER" ]; then
+    usage
+    exit 1
+fi
+
+SOURCE="$(echo "$HEADER" | sed 's/\.h$/.cpp/g')"
+if [ -f "$SOURCE" ]; then
+    echo "$SOURCE exists." 1>&2
+    exit 2
+fi
+
+echo "'$HEADER' -> '$SOURCE'"
+
+CLASS="$(basename "$HEADER" | sed 's/\.h$//g')"
+TMP="/tmp/.cp2cpp.$$.$CLASS"
+
+cat "$HEADER" | {
+
+    FIRST_INCLUDE=true
+    FIRST_COMMENTS=true
+    while read line; do
+
+        # Replace the header guards and all includes in the header with just one include of the header
+        echo "$line" | grep '^#' > /dev/null
+        if [ $? -eq 0 ]; then
+            if [ $FIRST_INCLUDE == true ]; then
+                FIRST_INCLUDE=false
+                echo "" >> "$SOURCE"
+                echo "#include \"$CLASS.h\"" >> "$SOURCE"
+                echo "" >> "$SOURCE"
+            fi
+            continue     
+        fi
+
+        # Remove all comments except the first
+        if [ $FIRST_COMMENTS == false ]; then
+            echo "$line" | tr -d [:space:] | grep '^\*\|^\/\*' > /dev/null
+            if [ $? -eq 0 ]; then
+                continue
+            fi
+        fi
+
+        # Detect end of first comment block
+        echo "$line" | grep '^\*/' > /dev/null
+        if [ $? -eq 0 ];  then
+            if [ $FIRST_COMMENTS == true ]; then
+                FIRST_COMMENTS=false
+            fi
+        fi
+
+        # Remove scope or class definitions
+        echo "$line" | grep 'public:\|protected:\|private:\|^class \|^}\|^{\| = delete;\| = default;\|using ' > /dev/null
+        if [ $? -eq 0 ]; then
+            continue
+        fi
+
+        # Bring everything down 2 indentions
+        if [ $FIRST_COMMENTS == false ]; then
+            line="$(echo "$line" | sed 's/        //g')"
+        fi
+        # Put the beginning spaces back on comment lines
+        line="$(echo "$line" | sed 's/^\*/ */g')"
+        # Include the namespace we are in so we don't have to type it 100 times
+        line="$(echo "$line" | sed 's/namespace \(.*\)/using namespace \1;/g')"
+        # Update the @file
+        line="$(echo "$line" | sed "s/$HEADER/$SOURCE/g")"
+        # Remove end of line comments
+        line="$(echo "$line" | sed "s/\/\/.*//g")"
+        # Remove single multi-line comments
+        line="$(echo "$line" | sed "s/\/\*.*\*\///g")"
+        # Remove member descriptions
+        line="$(echo "$line" | sed "s/ \<override\>//g")"
+        line="$(echo "$line" | sed "s/ \<final\>//g")"
+        line="$(echo "$line" | sed "s/\<extern\> //g")"
+
+        CPPID="[~A-Za-z_0-9:]*"
+        # Is this a member?
+        echo "$line" | grep -v '(INCLUDING' | grep "$CPPID(" > /dev/null
+        if [ $? -eq 0 ]; then
+            # Prepend Class:: to the methods and remove override/final/const/;
+            echo "$line" | grep "s/$CPPID(.*).*;" > /dev/null
+            if [ $? -eq 0 ]; then
+                line="$(echo "$line" | sed "s/\($CPPID\)(\(.*\)).*;/$CLASS::\1(\2)/g")"
+            else
+                # Prepend Class:: to the multi-line members
+                line="$(echo "$line" | sed "s/\($CPPID\)(/$CLASS::\1(/g")"
+            fi
+            # Remove default values
+            line="$(echo "$line" | sed "s/= $CPPID([a-zA-Z_0-9:()]*)//g")"
+
+            # Remove static keyword
+            line="$(echo "$line" | sed "s/\<static\> //g")"
+        else
+            # Possibly a member, convert static to class name
+            line="$(echo "$line" | sed "s/\<static\> \($CPPID\) \($CPPID\)/\1 $CLASS::\2/g")"
+        fi
+
+        FUNCTION=false
+        echo "$line" | grep ')[ a-z]*;$' > /dev/null
+        if [ $? -eq 0 ]; then
+            FUNCTION=true
+            # Remove semicolon
+            line="$(echo "$line" | sed "s/)\([ a-z]*\);/)\1/g")"
+        fi
+
+        # Anything left on this line?
+        if [ -z "$(echo "$line" | tr -d [:space:])" ]; then
+            continue
+        fi
+
+        # Append file
+        echo "$line" >> "$SOURCE"
+
+        # Write phony function
+        if [ $FUNCTION == true ]; then
+            echo "{" >> "$SOURCE"
+            echo "    // TODO" >> "$SOURCE"
+            echo "    return false;" >> "$SOURCE"
+            echo "}" >> "$SOURCE"
+            echo "" >> "$SOURCE"
+        fi
+    done
+}
+
+rm -f "$TMP"

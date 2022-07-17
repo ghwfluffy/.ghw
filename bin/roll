@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# Random Option Roll
+#
+# Usages:
+# roll [Max Number=100]
+# roll <Option 1> <Option 2> ... [Option n]
+
+set -eu -o pipefail
+
+# Use our rand binary
+rand="$(dirname "${0}")/rand"
+
+if [ $# -lt 2 ]; then
+    N=100
+    if [ $# -eq 1 ]; then
+        N="${1}"
+    fi
+    "${rand}" "${N}"
+else
+    X="$("${rand}" "${#}")"
+    let "X=X+1" || true
+    echo "${!X}"
+fi

@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# Calls make but pipes just the errors into less
+#
+
+set -eu -o pipefail
+
+script -efq -c "make ${@}" 2>&1 | {
+    ERRORS=""
+    while read line; do
+        if ! echo "${line}" | \
+            grep --color=never '^'$'\x1b''\|^\.\|^\[\|^gmake\|^\-\-\|^'"'" | \
+            grep -v 'error\|Error\|\.cpp:\|.h:';
+        then
+            ERRORS="${ERRORS}
+${line}"
+        fi
+    done
+    if [ ! -z "${ERRORS}" ]; then
+        echo "${ERRORS}" | less -R
+    fi
+}

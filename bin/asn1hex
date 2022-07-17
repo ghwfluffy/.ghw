@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# ASN.1 parse hex encoded data (stdargs or stdin)
+#
+
+set -eu -o pipefail
+
+# stdargs
+if [ $# -gt 0 ]; then
+    echo "$@" | hex2bin | openssl asn1parse -inform DER -i -dump
+else
+    # stdin
+    while read x
+    do
+        echo "${x}" | hex2bin | openssl asn1parse -inform DER -i -dump
+    done
+fi

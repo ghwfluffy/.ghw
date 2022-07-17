@@ -1,0 +1,75 @@
+#!/bin/bash
+
+EXE=${0##*/}
+if [ -z "$2" ]
+then
+    echo "Usage: $EXE <File Prefix> <New File Prefix>" 1>&2
+    exit 1;
+fi
+
+# Application name determines functionality
+# mvc is default
+CMD=mv
+EXT=c
+# mv cpp
+if [ "$EXE" == "mvcpp" ]
+then
+    EXT=cpp
+# cp cpp
+elif [ "$EXE" == "cpcpp" ]
+then
+    EXT=cpp
+    CMD=cp
+# cp c
+elif [ "$EXE" == "cpc" ]
+then
+    CMD=cp
+fi
+
+SRC="$1.$EXT"
+INC="$1.h"
+
+SRC2="$2.$EXT"
+INC2="$2.h"
+
+# Check if destination already exists
+if [ -f "$SRC2" ]
+then
+    echo "Destination file \"$SRC2\" exists." 1>&2
+    exit 2;
+fi
+
+if [ -f "$INC2" ]
+then
+    echo "Destination file \"$INC2\" exists." 1>&2
+    exit 3;
+fi
+
+# move/copy source
+if [ -f "$SRC" ]
+then
+    $CMD "$SRC" "$SRC2"
+    if [ $? -ne 0 ]
+    then
+        echo "Failed to $CMD source file to \"$SRC2\"." 1>&2
+        exit 4;
+    else
+        echo $CMD \"$SRC\" \"$SRC2\"
+    fi
+else
+    echo "File \"$SRC\" does not exist." 1>&2
+    exit 5;
+fi
+
+# move/copy header
+if [ -f "$INC" ]
+then
+    $CMD "$INC" "$INC2"
+    if [ $? -ne 0 ]
+    then
+        echo "Failed to $CMD header file to \"$INC2\"." 1>&2
+        exit 6;
+    else
+        echo $CMD \"$INC\" \"$INC2\"
+    fi
+fi

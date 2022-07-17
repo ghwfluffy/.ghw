@@ -1,0 +1,11 @@
+inspire() {
+    if [ "${TERM:0:5}" == "xterm" ]; then
+        ${GHWDIR}/ascii/tags/random.sh
+        echo ""
+        ${GHWDIR}/ascii/quotes/random.sh
+        echo ""
+        date '+%Y-%m-%d %r'
+    fi
+}
+
+inspire

@@ -1,0 +1,41 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Parse out the issuer and subject common names from a set of certificate files." 1>&2
+    echo "$(basename "${0}") <Certificate file> [Certificate file] ..." 1>&2
+    exit 1
+fi
+
+# For each input file
+while [ $# -gt 0 ]; do
+
+    FILE="${1}"
+    shift
+
+    # Parse file
+    TEXT="$(openssl x509 -in "${FILE}" -text -noout 2> /dev/null ||
+            openssl x509 -in "${FILE}" -inform DER -text -noout 2> /dev/null)"
+
+    # Failed to parse
+    if [ -z "${TEXT}" ]; then
+        continue
+    fi
+
+    # Print file name with underline
+    echo "${FILE}"
+    for ((i=0;i<${#FILE};i++)); do
+        echo -n "="
+    done
+    echo ""
+
+    # Parse out issuer and subject common names
+    echo -n "  Issuer: "
+    echo "$TEXT" | grep 'Issuer:' | grep -o 'CN *=.*' | cut -d'/' -f1
+    echo -n "  Subject: "
+    echo "$TEXT" | grep 'Subject:' | grep -o 'CN *=.*' | cut -d'/' -f1
+
+    echo ""
+done

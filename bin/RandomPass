@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+openssl rand -base64 1024 | tr -d '[:space:]'
+echo ""

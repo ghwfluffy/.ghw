@@ -1,0 +1,16 @@
+# Environment
+GHW_RUNONCE_VERS=1
+if [ -z "${GHW_RUNONCE}" ] || [ ${GHW_RUNONCE} -ne ${GHW_RUNONCE_VERS} ]; then
+    GHW_RUNONCE=${GHW_RUNONCE_VERS}
+
+    export PATH="${PATH}:${GHWDIR}/bin:${GHWDIR}/bin/lang"
+    export C_INCLUDE_PATH="${C_INCLUDE_PATH}:/home/${GHWUSER}/.ghw/include"
+    export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/home/${GHWUSER}/.ghw/lib"
+fi
+
+# Defeault editor
+export EDITOR=vi
+
+# Terminal type
+export TERM=xterm
+

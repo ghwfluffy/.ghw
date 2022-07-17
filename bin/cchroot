@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -u
+
+ROOT="${1}"
+
+for dir in dev dev/pts sys proc tmp; do
+    mount -o bind /${dir} ${ROOT}/${dir}
+done
+
+chroot ${ROOT}
+
+for dir in dev/pts sys proc tmp; do
+    umount ${ROOT}/${dir}
+done

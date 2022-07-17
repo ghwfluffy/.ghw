@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -lt 1 ]; then
+    echo "Convert fahrenheit to celsius" 1>&2
+    echo "Usage: $(basename) <Degrees fahrenheit>" 1>&2
+    exit 1
+fi
+
+F="${1}"
+
+echo "scale=2;((${F}-32)/180)*100" | bc

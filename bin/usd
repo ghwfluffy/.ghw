@@ -1,0 +1,49 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Format a number to USD" 1>&2
+    echo "Usage: $(basename "${0}") <Value>" 1>&2
+    exit 1
+fi
+
+# Input
+VALUE="${1}"
+
+# Detect and strip negative sign
+NEGATIVE=0
+if [ "${VALUE:0:1}" == "-" ]; then
+    NEGATIVE=1
+    VALUE="${VALUE:1:${#VALUE}}"
+fi
+
+# Canonicalize cents
+CENTS="$(echo "${VALUE}" | grep -o '\.[0-9]*' | grep -o '[0-9]*')" || true
+while [ ${#CENTS} -lt 2 ]; do
+    CENTS="${CENTS}0"
+done
+CENTS="${CENTS:0:2}"
+
+# Get dollras and add commas
+DOLLARS="$(echo "${VALUE}" | cut -d'.' -f1)"
+COMMAD=""
+for ((i=0;i<${#DOLLARS};i++)); do
+    let "MOD=i%3" || true
+    if [ $i -gt 0 ] && [ ${MOD} -eq 0 ]; then
+        COMMAD=",${COMMAD}"
+    fi
+
+    SIZE=${#DOLLARS}
+    let "POS=SIZE-i-1" || true
+    COMMAD="${DOLLARS:${POS}:1}${COMMAD}"
+done
+
+echo -n '$'
+if [ "${NEGATIVE}" -eq 1 ]; then
+    echo -n '-'
+fi
+echo -n "${COMMAD}"
+echo -n '.'
+echo "${CENTS}"

@@ -1,0 +1,80 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Generate a good random decimal number between 0 and Max-1" 1>&2
+    echo "Usage $(basename "${0}") <Max>" 1>&2
+    exit 1
+fi
+
+# Canonicalize string to unsigned integer
+function atoi() {
+    local VAR="${1}"
+    VAR="$(echo "${VAR}" | grep -o '^[0-9]*')"
+    if [ -z "${VAR}" ]; then
+        VAR="0"
+    fi
+    echo "${VAR}"
+}
+
+# Run a short(ish) test
+if [ "${1}" == "test" ]; then
+    SPREAD=()
+    for ((i=0;i<100;i++)); do
+        SPREAD[${i}]=0
+    done
+
+    MAX=10000
+    for ((i=0;i<${MAX};i++)); do
+        IDX=$("${0}" 100)
+        VALUE=SPREAD[${IDX}]
+        let "VALUE=VALUE+1" || true
+        SPREAD[${IDX}]=${VALUE}
+
+        let MOD="${i}%1000" || true
+        if [ ${MOD} -eq 0 ]; then
+            echo "${i}/${MAX}"
+        fi
+    done
+
+    for ((i=0;i<100;i++)); do
+        echo "${i}. ${SPREAD[${i}]}"
+    done
+
+    exit 0
+fi
+
+# Get input
+MAX="$(atoi "${1}")"
+if [ ${MAX} -le 1 ]; then
+    echo "0"
+    exit 0
+fi
+
+# How big of a number do we need to generate
+BUCKET_MAX=256
+BUCKET_SIZE=1
+while [ ${BUCKET_MAX} -le ${MAX} ]; do
+    let "BUCKET_MAX=BUCKET_MAX * 256" || true
+    let "BUCKET_SIZE=BUCKET_SIZE + 1" || true
+done
+
+# Chop some off the end to make the spread even
+let "BUCKET_COUNT=${BUCKET_MAX}/${MAX}" || true
+let "BUCKET_MAX=MAX * BUCKET_COUNT" || true
+
+# Generate a number within the appropriate range
+# Throw away numbers too big so the spread is equal
+VALUE=${BUCKET_MAX}
+while [ ${VALUE} -ge ${BUCKET_MAX} ]; do
+    VALUE_HEX="$(openssl rand -hex ${BUCKET_SIZE} | tr '[:lower:]' '[:upper:]')"
+    VALUE="$(echo "ibase=16;obase=A;${VALUE_HEX}" | bc)"
+done
+
+# Calculate final number
+let "VALUE=VALUE%MAX" || true
+
+# Output
+echo "${VALUE}"

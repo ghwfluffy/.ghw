@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Convert hex number to decimal" > 1&2
+    echo "Usage: $(basename "${0}") <Hex number>" 1>&2
+    exit 1
+fi
+
+echo ${@} | sed 's/ /\n/g' |
+{
+    while read line; do
+        echo "ibase=16;obase=A;${line}" | bc
+    done
+}

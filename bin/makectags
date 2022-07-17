@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Make ctags file for current directory
+#
+
+set -eu -o pipefail
+
+rm -f .ctags
+ctags \
+    --exclude=bak \
+    --exclude=target \
+    --exclude=build \
+    --exclude=Release \
+    --exclude=Debug \
+    -R -h '.h' -f .ctags .

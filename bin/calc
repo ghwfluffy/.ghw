@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -lt 1 ]; then
+    echo "Perform calculation" 1>&2
+    echo "Usage: $(basename "${0}") <Equation>" 1>&2
+    exit 1
+fi
+
+echo "scale=16;${@}" | bc

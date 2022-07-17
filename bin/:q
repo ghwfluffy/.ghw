@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Cheeky program when you accidentially type :q in the wrong window
+#
+
+set -eu -o pipefail
+
+echo -n "Are you sure you want to quit? (Y/N): "
+read n
+if [ "$n" == "Y" ] || [ "$n" == "y" ] || [ "$n" == "Yes" ] || [ "$n" == "YES" ] || [ "$n" == "yes" ]
+then
+    ParentPID="$(ps -ef | grep "$(whoami) *\<$$\> " | awk '{print $3}')"
+    kill -s SIGKILL "$ParentPID"
+    exit 1
+fi
+
+exit 2

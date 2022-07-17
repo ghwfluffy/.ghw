@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# Tries to find the location of the top-level git directory and print it
+#
+
+set -eu -o pipefail
+
+TOP="$(pwd)"
+DIR="${TOP}"
+
+while [ ${#DIR} -gt 1 ]; do
+    # Found directory
+    if [ -f ".git" ] || [ -d ".git" ]; then
+        echo "${DIR}"
+        exit 0
+    fi
+
+    # Try parent directory
+    cd ..
+    DIR="$(pwd)"
+done
+
+# Default to original directory and return error code
+echo "${TOP}"
+exit 1

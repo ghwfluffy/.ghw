@@ -1,0 +1,30 @@
+#!/bin/bash
+#
+# git ghw
+#
+
+set -eu -o pipefail
+
+# Terminal colors
+YELLOW='\x1b[33m'
+RESET='\x1b[0m'
+
+HASH=""
+while [ ${#HASH} -lt 40 ]; do
+    CUR="$(echo "ibase=10;obase=16;$RANDOM" | bc)"
+    HASH="${CUR}${HASH}"
+done
+HASH="$(echo "${HASH:0:40}" | tr '[:upper:]' '[:lower:]')"
+
+DATE="$(date +"%a %b %d %H:%M:%S %Y %z")"
+
+Ticket="GHW-1337"
+Message="Glory Health & Wealth"
+Name="Ghw Fluffy"
+Email="ghw@ghwfluffy.com"
+
+echo -e "${YELLOW}commit ${HASH}${RESET}
+Author: ${Name} <${Email}>
+Date:   ${DATE}
+
+    ${Ticket}: ${Message}"

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+URL="https://google.com"
+if [ $# -ge 1 ]; then
+    URL="${1}"
+fi
+
+google-chrome --incognito "${URL}" &
+

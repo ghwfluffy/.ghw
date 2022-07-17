@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ] || [ ! -f "${1}" ]; then
+    echo "Parse ASN.1 PEM-encoded file." 1>&2
+    echo "Usage: $(basename "${0}") <ASN.1 PEM file>" 1>&2
+    exit 1
+fi
+
+openssl asn1parse -inform PEM -i -dump -in "${1}"

@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Git diff (cached and not together)
+#
+# Usage: cldiff [File/Dir] [File/Dir]
+#
+
+set -eu -o pipefail
+
+FILES="."
+if [ $# -gt 0 ]; then
+    FILES="${@}"
+fi
+
+(
+    git -c color.ui=always diff --cached ${FILES}
+    git -c color.ui=always diff ${FILES}
+) | less -R

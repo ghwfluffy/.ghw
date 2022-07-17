@@ -1,0 +1,45 @@
+function atoi() {
+
+    local VAR="$1"
+    VAR="$(echo "$VAR" | grep -o '^[0-9]*')"
+    if [ -z "$VAR" ]; then
+        VAR="0"
+    fi
+
+    echo "$VAR"
+}
+
+function percentDecode() {
+    Text="$1"
+    Out=""
+    for ((i=0;i<${#Text};i++))
+    do
+        Char="${Text:$i:1}"
+        if [ "$Char" == "%" ]
+        then
+            let i='i+1'
+            Char=${Text:$i:2}
+            Char=$(printf "\x$Char")
+            let i='i+1'
+        fi
+        Out+="$Char"
+    done
+    echo "$Out"
+}
+
+# Allow for alias auto-complete
+function make-completion-wrapper () {
+  local function_name="$2"
+  local arg_count=$(($#-3))
+  local comp_function_name="$1"
+  shift 2
+  local function="
+    function $function_name {
+      ((COMP_CWORD+=$arg_count))
+      COMP_WORDS=( "$@" \${COMP_WORDS[@]:1} )
+      "$comp_function_name"
+      return 0
+    }"
+  eval "$function"
+}
+

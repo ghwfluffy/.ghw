@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ]; then
+    echo "Retrieve current stock price." 1>&2
+    echo "Usage: $(basename "${0}") <Stock ticker>" 1>&2
+    exit 1
+fi
+
+# Input
+STOCK="${1}"
+
+# Screen scrape from a Google search
+wget \
+    -U "Mozilla/5.0 (platform; rv:geckoversion) Gecko/geckotrail Firefox/5.0" \
+    -O - \
+    "https://www.google.com/search?q=${STOCK}+stock" 2> /dev/null | \
+    grep -o '[0-9][0-9]*\.[0-9][0-9] <span class="[A-Za-z0-9 ]*">[+-][0-9][0-9]*\.[0-9][0-9]* (' | \
+    head -n1 | \
+    awk '{print $1}'

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage instructions
+if [ $# -lt 1 ]; then
+    echo "Start a countdown in console." 1>&2
+    echo "$(basename "${0}") <Seconds>" 1>&2
+    exit 1
+fi
+
+COUNT="${1}"
+END="$((`date +%s` + ${COUNT}))"
+while [ "${END}" -ge "$(date +%s)" ]; do
+    echo -ne "$(date -u --date @$(("${END}" - "$(date '+%s')")) +%H:%M:%S)\r"
+    sleep 0.1
+done

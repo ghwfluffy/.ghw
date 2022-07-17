@@ -1,0 +1,17 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+if [ $# -lt 2 ]; then
+    echo "Listen on a TCP port and forward it to the specific IP/Port." 1>&2
+    echo "Usage: $(basename "${0}") <Listen Port> <Forward Address:Port>" 1>&2
+    exit 1
+fi
+
+PID="$(ps -ef | grep socat | grep "tcp-listen:${1}" | awk '{print $2}' || true)"
+if [ ! -z "${PID}" ]; then
+    echo "Killing ${PID}"
+    kill -9 "${PID}"
+fi
+
+socat tcp-listen:"${1}",reuseaddr,fork tcp:"${2}" &

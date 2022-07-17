@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu -o pipefail
+
+# Usage help
+if [ $# -lt 1 ] || [ ! -f "$(which "${1}")" ]; then
+    echo "Edit an executable file from your PATH" 1>&2
+    echo "Usage: $(basename "${0}") <Executable>" 1>&2
+    exit 1
+fi
+
+vi "$(which "${1}")"
