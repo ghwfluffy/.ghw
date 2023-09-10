@@ -1,0 +1,3 @@
+there are two ways to design a system:
+- make it so simple there are no obvious deficiencies
+- make it so complex there are no obvious deficiencies
