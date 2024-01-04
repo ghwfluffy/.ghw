@@ -1,0 +1,5 @@
+# Android SDK
+export ANDROID_HOME=/opt/android
+
+# Android NDK
+export ANDROID_NDK_ROOT=/opt/android/android-ndk-r26b
