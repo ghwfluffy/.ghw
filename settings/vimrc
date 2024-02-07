@@ -115,4 +115,6 @@ nnoremap <silent> Y i<End>() = default;<Esc><Home>wyypvwywp<Del>i &&<Esc><Home>w
 au BufNewFile,BufRead *.qml set ft=qml
 " swift highlighting
 au BufNewFile,BufRead *.swift set ft=java
-
+" godot highlighting
+au BufNewFile,BufRead *.gd set ft=gdscript
+au BufNewFile,BufRead *.tscn set ft=gdresource
