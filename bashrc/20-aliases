@@ -69,3 +69,5 @@ alias sudo='sudo env PATH=$PATH'
 
 alias ssh='ssh -o ServerAliveInterval=30'
 alias fixdisplay='sudo /usr/local/bin/ghw-udev/99-display.sh'
+
+alias cal='ncal -b'
