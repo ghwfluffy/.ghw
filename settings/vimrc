@@ -31,7 +31,7 @@ set showmode
 set matchpairs+=<:>
 
 " Brainrot files use 2 space tabs
-autocmd BufRead,BufNewFile *.vue,*.js,*.css,*html set tabstop=2 shiftwidth=2
+autocmd BufRead,BufNewFile *.vue,*.js,*.css,*html,*.yaml,*.yml,*.json,*.jsonl set tabstop=2 shiftwidth=2
 
 " ctags
 set tags=.ctags,../.ctags,../../.ctags,../../../.ctags,../../../../.ctags,../../../../../.ctags,../../../../../../.ctags,/usr/include/.ctags,/usr/include/openssl/.ctags
