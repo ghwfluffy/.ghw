@@ -18,7 +18,9 @@ bin/usbreset
 src/prettySQL/prettySQL
 bin/prettySQL
 src/memparse/memparse
+src/memparse/allmemparse
 bin/memparse
+bin/allmemparse
 
 # 3rd party apps
 bin/oid
