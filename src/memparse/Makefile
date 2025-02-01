@@ -6,7 +6,7 @@ BIN=memparse
 SRC=main.cpp
 
 ALL_BIN=allmemparse
-ALL_SRC=main.cpp
+ALL_SRC=allmem.cpp
 
 all:
 	$(CC) $(SRC) $(CFLAGS) -o $(BIN)
